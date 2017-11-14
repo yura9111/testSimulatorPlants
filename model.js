@@ -43,8 +43,20 @@ var game = {
 
         // var x = x / screenWidth;
         // var y = y / screenHeight;
+        x-=18;
+        y-=10;
+        var position = map.pxToPosition({x:x,y:y});
 
-        document.getElementById('position').innerHTML = (x + "," + y);
+        document.getElementById('position').innerHTML = position;
+
+        if(typeof (game.map[position]) != "undefined"){
+            document.getElementById('age').innerHTML = game.map[position].age;
+            document.getElementById('same').innerHTML = game.map[position].influence.same;
+            document.getElementById('different').innerHTML = game.map[position].influence.different;
+            document.getElementById('hp').innerHTML = game.map[position].hp;
+            document.getElementById('multiply').innerHTML = game.map[position].multiply;
+            document.getElementById('identity').innerHTML = game.map[position].identification;
+        }
 
     },
 
@@ -112,14 +124,12 @@ var game = {
                         if (this.shouldRender) {
                             // ctx.fillStyle = "#FFFFFF";
                             //drawCell(ctx, x, y);
-                            if(renderActions){
-                                // if(typeof (plant) == "undefined")debugger;
-                                // afterWards = _.compose(afterWards, function(plant){
-                                //     return function(){
+                            if (renderActions) {
+                                afterWards = _.compose(afterWards, function (plant) {
+                                    return function () {
                                         plant.renderActions();
-                                //     }
-                                // }(plant));
-
+                                    }
+                                }(plant));
                             }
                         }
 
@@ -190,6 +200,9 @@ map = {
         var x2 = x + cellSize;
         var y2 = y + cellSize;
         return {x:x,y:y,x2:x2,y2:y2};
+    },
+    pxToPosition: function(point){
+        return Math.floor(point.x / (cellSize + cellBorderWidth)) + "," + Math.floor(point.y / (cellSize + cellBorderWidth));
     },
     // cacheAdjust: function(){
     //     for (var x=0;x<10;x++){
@@ -306,7 +319,7 @@ function c_plant(position, originalPlant){
         this.age = 0;
 
         this.position = position;
-        // this.multiplyChance = originalPlant.multiplyChance + Math.round(_.random(-53, 52) / 100);
+        this.multiplyChance = originalPlant.multiplyChance + Math.round(_.random(-53, 52) / 100);
         this.influence = {};
 
         change = Math.round(_.random(-53, 52) / 100);
@@ -374,17 +387,17 @@ function c_plant(position, originalPlant){
                     _.invoke(_.where(this.getAdjust(), {identification: this.identification}), "addHP", val, this);
                 }
             }
-            // if (_.random(0, 100) < this.multiplyChance){
-            var free = this.getAdjustFree();
+            if (_.random(0, 100) < this.multiplyChance){
+                var free = this.getAdjustFree();
 
-            if (free.length > 0 ){
-                // console.log(free);
-                free = free[randomKey(free)];
-                // console.log(free);
-                // free = free.pop();
-                game.map[free] = new c_plant(free, this);
+                if (free.length > 0 ){
+                    // console.log(free);
+                    free = free[randomKey(free)];
+                    // console.log(free);
+                    // free = free.pop();
+                    game.map[free] = new c_plant(free, this);
+                }
             }
-            // }
             if (this.age > this.maxAge){
                 this.die();
             }
