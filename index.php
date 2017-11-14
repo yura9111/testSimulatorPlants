@@ -24,6 +24,8 @@ Hello world!
     <dd>Определение термина 1</dd>
     <dt>Different</dt>
     <dd>Определение термина 2</dd>
+    <dt>Position</dt>
+    <dd id="position">0,0</dd>
 </dl>
 </body>
 </html>

@@ -1,8 +1,8 @@
 /**
  * Created by Юра on 26.07.2017.
  */
-const screenWidth = 45;
-const screenHeight = 30;
+const screenWidth = 20;
+const screenHeight = 20;
 const lineDeviation = {x:10,y:10};
 const cellSize = 30;
 var cellBorderWidth = 1;
@@ -37,8 +37,10 @@ var game = {
             y = e.pageY; // Координата Y курсора
         }
 
-        var x = x / screenWidth;
-        var y = y / screenHeight;
+        // var x = x / screenWidth;
+        // var y = y / screenHeight;
+
+        document.getElementById('position').innerHTML = (x + "," + y);
 
     },
 
@@ -219,15 +221,15 @@ map = {
         var xy = position.split(",");
         var x2 = xy[0]*1+1;
         var y2 = xy[1]*1+1;
-        var x= x2-2;
-        var y = y2-2;
-        if(x2 > screenWidth)x2 = screenWidth;
+        var x = x2-2;
+        var y0 = y2-2;
+        if(x2 > screenWidth - 1)x2 = screenWidth - 1;
         if(y2 > screenHeight - 1)y2 = screenHeight - 1;
         if(x < 0)x = 0;
-        if(y < 0)y = 0;
+        if(y0 < 0)y0 = 0;
         var ret = [];
         for (x; x <= x2; x++){
-            for (y; y <= y2; y++){
+            for (var y = y0; y <= y2; y++){
                 // if (typeof(game.map[x+","+y]) == "undefined")continue;
                 ret.push(game.map[x+","+y]);
             }
@@ -239,14 +241,14 @@ map = {
         var x2 = xy[0]*1+1;
         var y2 = xy[1]*1+1;
         var x= x2-2;
-        var y = y2-2;
-        if(x2 > screenWidth)x2 = screenWidth;
+        var y0 = y2-2;
+        if(x2 > screenWidth - 1)x2 = screenWidth - 1;
         if(y2 > screenHeight - 1)y2 = screenHeight - 1;
         if(x < 0)x = 0;
-        if(y < 0)y = 0;
+        if(y0 < 0)y0 = 0;
         var ret = [];
         for (x; x <= x2; x++){
-            for (y; y <= y2; y++){
+            for (var y = y0; y <= y2; y++){
                 if (game.map[x+","+y].identification === 0){
                     ret.push(x+","+y);
                 }
@@ -359,7 +361,7 @@ function c_plant(position, originalPlant){
             for (var x in this.influence){
                 var val = this.influence[x];
                 if (x == 'different'){
-                    _.invoke(_.filter(this.getAdjust(), function(obj){return obj.identification != selfIdentification}), "addHP", val, this);
+                    _.invoke(_.filter(this.getAdjust(), function(obj){if(typeof(obj)=="undefined")debugger;return obj.identification != selfIdentification}), "addHP", val, this);
                 }
                 if (x == 'self'){
                     if (this.addHP(val, this) === true)return;
