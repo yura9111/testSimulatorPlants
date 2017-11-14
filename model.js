@@ -1,10 +1,10 @@
 /**
  * Created by Юра on 26.07.2017.
  */
-const screenWidth = 20;
-const screenHeight = 20;
+const screenWidth = 80;
+const screenHeight = 30;
 const lineDeviation = {x:10,y:10};
-const cellSize = 30;
+const cellSize = 20;
 var cellBorderWidth = 1;
 const renderActions = 1;
 var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
@@ -59,7 +59,7 @@ var game = {
             document.getElementById('same').innerHTML = game.map[position].influence.same;
             document.getElementById('different').innerHTML = game.map[position].influence.different;
             document.getElementById('hp').innerHTML = game.map[position].hp;
-            document.getElementById('multiply').innerHTML = game.map[position].multiply;
+            document.getElementById('multiply').innerHTML = game.map[position].multiplyChance;
             document.getElementById('identity').innerHTML = game.map[position].identification;
         }
 
@@ -83,7 +83,7 @@ var game = {
         var ctx = canvas.getContext('2d');
         this.ctx = ctx;
         var colorRed, colorGreen, colorBlue;
-        var afterWards = function(){};
+        var afterDraw = [];
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
                 if (this.map[x + "," + y].identification !== 0){
@@ -130,16 +130,12 @@ var game = {
                         }else{
                             ctx.fillStyle=plant.identification;
                         }
-                        drawCell(ctx, x, y);
                         if (this.shouldRender) {
+                            drawCell(ctx, x, y);
                             // ctx.fillStyle = "#FFFFFF";
                             //drawCell(ctx, x, y);
                             if (renderActions) {
-                                afterWards = _.compose(afterWards, function (plant) {
-                                    return function () {
-                                        plant.renderActions();
-                                    }
-                                }(plant));
+                                afterDraw.push(plant.position);
                             }
                         }
 
@@ -155,7 +151,9 @@ var game = {
 
                 }
             }
-            afterWards();
+        }
+        for(var x in afterDraw){
+            this.map[ afterDraw[x] ].renderActions();
         }
 
 
