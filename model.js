@@ -1,9 +1,10 @@
 /**
  * Created by Юра on 26.07.2017.
  */
-const screenWidth = 100;
-const screenHeight = 100;
-const cellSize = 15;
+const screenWidth = 45;
+const screenHeight = 30;
+const lineDeviation = {x:10,y:10};
+const cellSize = 30;
 var cellBorderWidth = 1;
 const renderActions = 1;
 
@@ -57,7 +58,9 @@ var game = {
         canvas.height = (screenHeight * cellSize) + (screenHeight * cellBorderWidth);
 
         var ctx = canvas.getContext('2d');
+        this.ctx = ctx;
         var colorRed, colorGreen, colorBlue;
+        var afterWards = function(){};
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
                 if (this.map[x + "," + y].identification !== 0){
@@ -98,7 +101,21 @@ var game = {
                         if (colorBlue  < 10)colorBlue = "0"+colorBlue;
                         // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
                         ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
+                        ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
                         ctx.fillRect(x + x*cellSize,y + y*cellSize,cellSize,cellSize);
+                        if (this.shouldRender) {
+                            // ctx.fillStyle = "#FFFFFF";
+                            // ctx.fillRect(x * (cellBorderWidth + cellSize), y * (cellBorderWidth + cellSize), cellSize, cellSize);
+                            if(renderActions){
+                                // if(typeof (plant) == "undefined")debugger;
+                                // afterWards = _.compose(afterWards, function(plant){
+                                //     return function(){
+                                        plant.renderActions();
+                                //     }
+                                // }(plant));
+
+                            }
+                        }
 
                         // ctx.beginPath();
                         // ctx.arc(cellSize + x + x*cellSize,cellSize + y + y*cellSize,cellSize/2 - cellBorderWidth,0,2*Math.PI);
@@ -109,17 +126,49 @@ var game = {
                     this.map[x+","+y].onNextTurn();
 
                 }else{
-                    if (this.shouldRender) {
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fillRect(x * (cellBorderWidth + cellSize), y * (cellBorderWidth + cellSize), cellSize, cellSize);
-                        if(renderActions){
-                            // plant.renderActions(ctx);
-                        }
-                    }
+
                 }
             }
+            afterWards();
         }
 
+
+    },
+    renderArrow: function(color, fromPosition, toPosition){
+        var ctx = this.ctx;
+        // ctx.fillStyle = color;
+        var fromRect = map.getRectPx(fromPosition);
+        var toRect = map.getRectPx(toPosition);
+        var line = {x: (fromRect.x + fromRect.x2) / 2, y: (fromRect.y + fromRect.y2) / 2, x2: (toRect.x + toRect.x2) / 2, y2: (toRect.y + toRect.y2) / 2};
+        //decide if arrow higher or lower
+        if(fromRect.x <= toRect.x){
+            //higher
+            line.y += lineDeviation.y;
+            if(toRect.y < toRect.y){
+                //left
+                line.x -= lineDeviation.x;
+            }else{
+                //right
+                line.x += lineDeviation.x;
+            }
+        }else{
+            //lower
+            line.y -= lineDeviation.y;
+        }
+
+        var headlen = 10;   // length of head in pixels
+        var angle = Math.atan2(line.y2-line.y,line.x2-line.x);
+        // ctx.fillStyle = ""
+        ctx.beginPath();
+        ctx.lineWidth=1;
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.moveTo(line.x, line.y);
+        ctx.lineTo(line.x2, line.y2);
+        ctx.lineTo(line.x2-headlen*Math.cos(angle-Math.PI/6),line.y2-headlen*Math.sin(angle-Math.PI/6));
+        ctx.moveTo(line.x2, line.y2);
+        ctx.lineTo(line.x2-headlen*Math.cos(angle+Math.PI/6),line.y2-headlen*Math.sin(angle+Math.PI/6));
+        ctx.stroke();
 
     }
 }
@@ -127,6 +176,14 @@ map = {
     cachedAdjust: [],
     kill: function(position){
         game.map[position] = new c_empty(position);
+    },
+    getRectPx: function(position){
+        var xy = position.split(",");
+        var x = xy[0] * (cellBorderWidth + cellSize);
+        var y = xy[1] * (cellBorderWidth + cellSize);
+        var x2 = x + cellSize;
+        var y2 = y + cellSize;
+        return {x:x,y:y,x2:x2,y2:y2};
     },
     // cacheAdjust: function(){
     //     for (var x=0;x<10;x++){
@@ -200,6 +257,7 @@ map = {
 }
 function c_empty(position){
     this.identification = 0;
+    this.position = position;
     var xy = position.split(",");
     var x = xy[0];
     var y = xy[1];
@@ -207,6 +265,7 @@ function c_empty(position){
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(x + x * cellSize, y + y * cellSize, cellSize, cellSize);
+    this.renderActions = function(){};
 }
 /**
  *
@@ -324,11 +383,11 @@ function c_plant(position, originalPlant){
                 this.die();
             }
         },
-        this.renderActions = function(ctx){
+        this.renderActions = function(){
             var selfIdentification = this.identification;
             for (var x in this.influence){
                 var val = this.influence[x];
-                if (x == 'different'){
+                if (x == 'different' && val != 0 ){
                     _.each(
                         _.filter(
                             this.getAdjust(),
@@ -336,22 +395,27 @@ function c_plant(position, originalPlant){
                                 return obj.identification != selfIdentification
                             }
                         ),
-                        function(){
-                            //pick color
-                            // ctx.fillStyle = "#FFFFFF";
-                            // ctx.beginPath();
-                            // ctx.moveTo(0,0);
-                            // ctx.lineTo(300,150);
-                            // ctx.stroke();
-                        }
+                        function(plant){
+                            var self = plant;
+                            return function(plant, val){
+                                var color = val > 0 ? "#00FF00": "#FF0000" ;
+                                game.renderArrow(color, self.position, plant.position);
+                            }
+                        }(this, val)
                     );
                 }
-                if (x == 'self'){
-                    if (this.addHP(val, this) === true)return;
-                }
-                if (x == 'same'){
-                    _.invoke(_.where(this.getAdjust(), {identification: this.identification}), "addHP", val, this);
-                }
+                // if (x == 'self'){
+                //     if (this.addHP(val, this) === true)return;
+                // }
+                // if (x == 'same'){
+                //     _.each(_.where(this.getAdjust(), {identification: this.identification}), function (plant) {
+                //         var self = plant;
+                //         return function (plant, val) {
+                //             var color = val > 0 ? "green" : "red";
+                //             game.renderArrow(color, self.position, plant.position);
+                //         }
+                //     }(this, val));
+                // }
             }
         }
 }
