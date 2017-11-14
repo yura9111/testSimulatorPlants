@@ -17,6 +17,10 @@ function randomKey(obj) {
     return ret;
 }
 
+function drawCell(g2dContext, x, y) {
+    g2dContext.fillRect(x * (cellSize + cellBorderWidth), y * (cellSize + cellBorderWidth), cellSize, cellSize);
+}
+
 var game = {
     shouldRender: true,
 
@@ -56,8 +60,8 @@ var game = {
 
     nextTurn: function(){
         var canvas = document.getElementById("canvas");
-        canvas.width = (screenWidth * cellSize) + (screenWidth * cellBorderWidth);
-        canvas.height = (screenHeight * cellSize) + (screenHeight * cellBorderWidth);
+        canvas.width = screenWidth * (cellSize + cellBorderWidth);
+        canvas.height = screenHeight * (cellSize + cellBorderWidth);
 
         var ctx = canvas.getContext('2d');
         this.ctx = ctx;
@@ -104,10 +108,10 @@ var game = {
                         // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
                         ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
                         ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
-                        ctx.fillRect(x + x*cellSize,y + y*cellSize,cellSize,cellSize);
+                        drawCell(ctx, x, y);
                         if (this.shouldRender) {
                             // ctx.fillStyle = "#FFFFFF";
-                            // ctx.fillRect(x * (cellBorderWidth + cellSize), y * (cellBorderWidth + cellSize), cellSize, cellSize);
+                            //drawCell(ctx, x, y);
                             if(renderActions){
                                 // if(typeof (plant) == "undefined")debugger;
                                 // afterWards = _.compose(afterWards, function(plant){
@@ -266,7 +270,7 @@ function c_empty(position){
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(x + x * cellSize, y + y * cellSize, cellSize, cellSize);
+    drawCell(ctx, x, y);
     this.renderActions = function(){};
 }
 /**
