@@ -1,0 +1,54 @@
+[
+    {
+        "name": "components/underscore",
+        "version": "1.8.3",
+        "version_normalized": "1.8.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/components/underscore.git",
+            "reference": "91142c898763ca8bb23a32a9808735e4998839d1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/components/underscore/zipball/91142c898763ca8bb23a32a9808735e4998839d1",
+            "reference": "91142c898763ca8bb23a32a9808735e4998839d1",
+            "shasum": ""
+        },
+        "time": "2015-10-16T14:27:39+00:00",
+        "type": "component",
+        "extra": {
+            "component": {
+                "scripts": [
+                    "underscore.js"
+                ],
+                "files": [
+                    "underscore-min.js",
+                    "underscore-min.map"
+                ],
+                "shim": {
+                    "exports": "_"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jeremy Ashkenas",
+                "email": "jeremy@documentcloud.org"
+            }
+        ],
+        "description": "JavaScript's functional programming helper library.",
+        "homepage": "http://underscorejs.org",
+        "keywords": [
+            "browser",
+            "client",
+            "functional",
+            "server",
+            "util"
+        ]
+    }
+]
