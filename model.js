@@ -7,6 +7,11 @@ const lineDeviation = {x:10,y:10};
 const cellSize = 30;
 var cellBorderWidth = 1;
 const renderActions = 1;
+var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+
+function getRandValueFromArray(Ar){
+    return Ar[Math.floor(Math.random() * Ar.length)];
+}
 
 function randomKey(obj) {
     var ret;
@@ -118,8 +123,13 @@ var game = {
                         if (colorGreen < 10)colorGreen = "0"+colorGreen;
                         if (colorBlue  < 10)colorBlue = "0"+colorBlue;
                         // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
-                        ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
-                        ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
+                        // ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
+                        // ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
+                        if(plant.identification == 0){
+
+                        }else{
+                            ctx.fillStyle=plant.identification;
+                        }
                         drawCell(ctx, x, y);
                         if (this.shouldRender) {
                             // ctx.fillStyle = "#FFFFFF";
@@ -298,7 +308,7 @@ function c_plant(position, originalPlant){
         this.maxAge = 5;
         this.age = _.random(1, this.maxAge);
         this.position = position;
-        this.identification = 1;
+        this.identification = "#666";
         this.multiplyChance = 50;
         this.influence = {
             different: 0,
@@ -337,7 +347,7 @@ function c_plant(position, originalPlant){
         this.influence.same = originalPlant.influence.same + change;
 
         if (idPlus > 0){
-            this.identification = _.random(-10000, 10000);
+            this.identification = "#"+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues);
         }else{
             this.identification = originalPlant.identification;
         }
