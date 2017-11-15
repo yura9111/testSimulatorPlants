@@ -6,7 +6,6 @@ const screenHeight = 30;
 const lineDeviation = {x:10,y:10};
 const cellSize = 20;
 var cellBorderWidth = 1;
-const renderActions = 0;
 var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
 function getRandValueFromArray(Ar){
@@ -28,6 +27,7 @@ function drawCell(g2dContext, x, y) {
 
 var game = {
     shouldRender: true,
+    shouldRenderArrows: true,
 
     play: function(){
         this.interval = setInterval(function(){game.nextTurn()},50);
@@ -134,7 +134,7 @@ var game = {
                             drawCell(ctx, x, y);
                             // ctx.fillStyle = "#FFFFFF";
                             //drawCell(ctx, x, y);
-                            if (renderActions) {
+                            if (this.shouldRenderArrows) {
                                 afterDraw.push(plant.position);
                             }
                         }
