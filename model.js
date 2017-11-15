@@ -6,7 +6,7 @@ const screenHeight = 30;
 const lineDeviation = {x:10,y:10};
 const cellSize = 20;
 var cellBorderWidth = 1;
-const renderActions = 1;
+const renderActions = 0;
 var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
 function getRandValueFromArray(Ar){
@@ -55,10 +55,10 @@ var game = {
         document.getElementById('position').innerHTML = position;
 
         if(typeof (game.map[position]) != "undefined"){
-            document.getElementById('age').innerHTML = game.map[position].age;
+            document.getElementById('age').innerHTML = game.map[position].age + "/" + game.map[position].maxAge;
             document.getElementById('same').innerHTML = game.map[position].influence.same;
             document.getElementById('different').innerHTML = game.map[position].influence.different;
-            document.getElementById('hp').innerHTML = game.map[position].hp;
+            document.getElementById('hp').innerHTML = game.map[position].hp + "/" + game.map[position].maxHP;
             document.getElementById('multiply').innerHTML = game.map[position].multiplyChance;
             document.getElementById('identity').innerHTML = game.map[position].identification;
         }
@@ -307,7 +307,7 @@ function c_plant(position, originalPlant){
         this.age = _.random(1, this.maxAge);
         this.position = position;
         this.identification = "#666";
-        this.multiplyChance = 50;
+        this.multiplyChance = 20;
         this.influence = {
             different: 0,
             self: 0,
@@ -353,6 +353,9 @@ function c_plant(position, originalPlant){
     }
     this.addHP = function(val, from){
         this.hp += val;
+        if(this.hp > this.maxHP){
+            this.hp = this.maxHP;
+        }
         if (val < 0){
             from.hp -= val;
         }
