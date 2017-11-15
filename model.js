@@ -3,10 +3,13 @@
  */
 const screenWidth = 80;
 const screenHeight = 30;
-const lineDeviation = {x:10,y:10};
 const cellSize = 20;
-var cellBorderWidth = 1;
-var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+const cellBorderWidth = 1;
+
+const renderTickInterval = 50;
+
+const lineDeviation = {x:10,y:10};
+const HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
 function getRandValueFromArray(Ar){
     return Ar[Math.floor(Math.random() * Ar.length)];
@@ -30,7 +33,7 @@ var game = {
     shouldRenderArrows: true,
 
     play: function(){
-        this.interval = setInterval(function(){game.nextTurn()},50);
+        this.interval = setInterval(function(){game.nextTurn()},renderTickInterval);
     },
     stop: function(){
         clearInterval(this.interval);
@@ -125,9 +128,7 @@ var game = {
                         // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
                         // ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
                         // ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
-                        if(plant.identification == 0){
-
-                        }else{
+                        if(plant.identification !== 0){
                             ctx.fillStyle=plant.identification;
                         }
                         if (this.shouldRender) {
