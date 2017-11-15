@@ -57,13 +57,15 @@ var game = {
 
         document.getElementById('position').innerHTML = position;
 
-        if(typeof (game.map[position]) != "undefined"){
+        if(typeof (game.map[position]) !== "undefined"){
             document.getElementById('age').innerHTML = game.map[position].age + "/" + game.map[position].maxAge;
-            document.getElementById('same').innerHTML = game.map[position].influence.same;
-            document.getElementById('different').innerHTML = game.map[position].influence.different;
             document.getElementById('hp').innerHTML = game.map[position].hp + "/" + game.map[position].maxHP;
             document.getElementById('multiply').innerHTML = game.map[position].multiplyChance;
             document.getElementById('identity').innerHTML = game.map[position].identification;
+            if (game.map[position].influence !== undefined) {
+                document.getElementById('same').innerHTML = game.map[position].influence.same;
+                document.getElementById('different').innerHTML = game.map[position].influence.different;
+            }
         }
 
     },
