@@ -402,6 +402,7 @@ function c_plant(position, originalPlant){
                 var free = this.getAdjustFree();
 
                 if (free.length > 0 ){
+                    this.hp -= Math.floor(this.hp/2);
                     // console.log(free);
                     free = free[randomKey(free)];
                     // console.log(free);
