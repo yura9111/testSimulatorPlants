@@ -3,7 +3,7 @@
  */
 const screenWidth = 80;
 const screenHeight = 30;
-const lineDeviation = {x:10,y:10};
+const lineDeviation = {x:5,y:5};
 const cellSize = 20;
 var cellBorderWidth = 1;
 var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
@@ -423,7 +423,7 @@ function c_plant(position, originalPlant){
                         _.filter(
                             this.getAdjust(),
                             function(obj){
-                                return obj.identification != selfIdentification
+                                return obj.identification != selfIdentification && obj.identification !== 0;
                             }
                         ),
                         function(plant){
