@@ -1,11 +1,11 @@
 /**
  * Created by Юра on 26.07.2017.
  */
-const screenWidth = 80;
-const screenHeight = 30;
+const screenWidth = 160;
+const screenHeight = 60;
 const lineDeviation = {x:5,y:5};
-const cellSize = 20;
-var cellBorderWidth = 1;
+const cellSize = 1;
+var cellBorderWidth = 0;
 var HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
 function getRandValueFromArray(Ar){
@@ -27,7 +27,7 @@ function drawCell(g2dContext, x, y) {
 
 var game = {
     shouldRender: true,
-    shouldRenderArrows: true,
+    shouldRenderArrows: false,
 
     play: function(){
         this.interval = setInterval(function(){game.nextTurn()},50);
@@ -88,40 +88,40 @@ var game = {
             for (var y = 0; y < screenHeight; y++){
                 if (this.map[x + "," + y].identification !== 0){
                     var plant = this.map[x + "," + y];
-                    try{
-                        var color = this.map[x + "," + y].getLifePercentage();
-                    }catch (e){
-                        console.log(this.map[x + "," + y].identification);
-                        console.log(x + "," + y);
-                        console.log(e);
-                        continue;
-                    }
+                    // try{
+                    //     var color = this.map[x + "," + y].getLifePercentage();
+                    // }catch (e){
+                    //     console.log(this.map[x + "," + y].identification);
+                    //     console.log(x + "," + y);
+                    //     console.log(e);
+                    //     continue;
+                    // }
                     //draw canvas
                     if (this.shouldRender){
-                        colorRed = Math.round(color/4);
-                        colorGreen = Math.round(color/4);
-                        colorBlue = Math.round(color/4);
-                        if (plant.influence.different < 0){
-                            colorRed += Math.round(color/4);
-                        }else
-                        if (plant.influence.different > 0){
-                            colorGreen += Math.round(color/4);
-                        }
-                        if (plant.influence.same < 0){
-                            colorRed += Math.round(color/4);
-                        }else
-                        if (plant.influence.same > 0){
-                            colorGreen += Math.round(color/4);
-                        }
-                        if (plant.influence.self < 0){
-                            colorRed += Math.round(color/4);
-                        }else
-                        if (plant.influence.self > 0){
-                            colorGreen += Math.round(color/4);
-                        }
-                        if (colorRed < 10)colorRed = "0"+colorRed;
-                        if (colorGreen < 10)colorGreen = "0"+colorGreen;
-                        if (colorBlue  < 10)colorBlue = "0"+colorBlue;
+                        // colorRed = Math.round(color/4);
+                        // colorGreen = Math.round(color/4);
+                        // colorBlue = Math.round(color/4);
+                        // if (plant.influence.different < 0){
+                        //     colorRed += Math.round(color/4);
+                        // }else
+                        // if (plant.influence.different > 0){
+                        //     colorGreen += Math.round(color/4);
+                        // }
+                        // if (plant.influence.same < 0){
+                        //     colorRed += Math.round(color/4);
+                        // }else
+                        // if (plant.influence.same > 0){
+                        //     colorGreen += Math.round(color/4);
+                        // }
+                        // if (plant.influence.self < 0){
+                        //     colorRed += Math.round(color/4);
+                        // }else
+                        // if (plant.influence.self > 0){
+                        //     colorGreen += Math.round(color/4);
+                        // }
+                        // if (colorRed < 10)colorRed = "0"+colorRed;
+                        // if (colorGreen < 10)colorGreen = "0"+colorGreen;
+                        // if (colorBlue  < 10)colorBlue = "0"+colorBlue;
                         // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
                         // ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
                         // ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
@@ -242,8 +242,7 @@ map = {
     //     }
     //     cachedAdjust[position] = ret;
     // },
-    getAdjust: function(position){
-        var xy = position.split(",");
+    getAdjust: function(xy){
         var x2 = xy[0]*1+1;
         var y2 = xy[1]*1+1;
         var x = x2-2;
@@ -261,8 +260,7 @@ map = {
         }
         return ret;
     },
-    getAdjustFree: function(position){
-        var xy = position.split(",");
+    getAdjustFree: function(xy){
         var x2 = xy[0]*1+1;
         var y2 = xy[1]*1+1;
         var x= x2-2;
@@ -306,6 +304,7 @@ function c_plant(position, originalPlant){
         this.maxAge = 5;
         this.age = _.random(1, this.maxAge);
         this.position = position;
+        this.xy = position.split(',');
         this.identification = "#666";
         this.multiplyChance = 20;
         this.influence = {
@@ -327,6 +326,7 @@ function c_plant(position, originalPlant){
         this.age = 0;
 
         this.position = position;
+        this.xy = position.split(',');
         this.multiplyChance = originalPlant.multiplyChance + Math.round(_.random(-53, 52) / 100);
         this.influence = {};
 
@@ -375,10 +375,10 @@ function c_plant(position, originalPlant){
             return Math.round(((this.maxAge - this.age))*20);
         },
         this.getAdjust = function(){
-            return map.getAdjust(this.position);
+            return map.getAdjust(this.xy);
         },
         this.getAdjustFree = function(){
-            return map.getAdjustFree(this.position);
+            return map.getAdjustFree(this.xy);
         },
         this.onNextTurn = function(){
             this.age++;
@@ -389,7 +389,7 @@ function c_plant(position, originalPlant){
             for (var x in this.influence){
                 var val = this.influence[x];
                 if (x == 'different'){
-                    _.invoke(_.filter(this.getAdjust(), function(obj){if(typeof(obj)=="undefined")debugger;return obj.identification != selfIdentification}), "addHP", val, this);
+                    _.invoke(_.filter(this.getAdjust(), function(obj){return obj.identification != selfIdentification}), "addHP", val, this);
                 }
                 if (x == 'self'){
                     if (this.addHP(val, this) === true)return;
