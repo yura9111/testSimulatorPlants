@@ -6,9 +6,11 @@ const screenHeight = 30;
 const cellSize = 20;
 const cellBorderWidth = 1;
 
+var bombRadius = 5;
+
 const renderTickInterval = 50;
 
-const lineDeviation = {x:10,y:10};
+const lineDeviation = {x:10, y:10};
 const HEXValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
 function getRandValueFromArray(Ar){
@@ -39,21 +41,7 @@ var game = {
         clearInterval(this.interval);
     },
     mousemove:function(e){
-        // Для браузера IE
-        if (document.all)  {
-            x = event.x + document.body.scrollLeft;
-            y = event.y + document.body.scrollTop;
-            // Для остальных браузеров
-        } else {
-            x = e.pageX; // Координата X курсора
-            y = e.pageY; // Координата Y курсора
-        }
-
-        // var x = x / screenWidth;
-        // var y = y / screenHeight;
-        x-=18;
-        y-=10;
-        var position = map.pxToPosition({x:x,y:y});
+        var position = map.pxToCellCoordinate(this.getCursorPosition(e));
 
         document.getElementById('position').innerHTML = position;
 
@@ -67,8 +55,39 @@ var game = {
                 document.getElementById('different').innerHTML = game.map[position].influence.different;
             }
         }
-
     },
+    getCursorPosition: function(e){
+        // Для браузера IE
+        if (document.all)  {
+            x = event.x + document.body.scrollLeft;
+            y = event.y + document.body.scrollTop;
+            // Для остальных браузеров
+        } else {
+            x = e.pageX; // Координата X курсора
+            y = e.pageY; // Координата Y курсора
+        }
+
+        x -= this.ctx.canvas.offsetLeft;
+        y -= this.ctx.canvas.offsetTop;
+        return {x: x, y: y}
+    },
+
+    blowBomb: function(e) {
+        console.log('BLOW');
+        var cursorPosition = this.getCursorPosition(e);
+        var x = map.pxToCellPosition(cursorPosition.x);
+        var y = map.pxToCellPosition(cursorPosition.y);
+
+        for ( var mapX = x - bombRadius; mapX <= x + bombRadius; mapX++ ) {
+            if (mapX < 0) mapX = 0;
+            if (mapX > screenWidth) break;
+            for ( var mapY = y - bombRadius; mapY <= y + bombRadius; mapY++ ) {
+                if (mapY < 0) mapY = 0;
+                if (mapY > screenWidth) break;
+                map.kill(mapX+ "," + mapY);
+            }
+        }
+    } ,
 
     init: function(){
         this.map = [];
@@ -212,8 +231,11 @@ map = {
         var y2 = y + cellSize;
         return {x:x,y:y,x2:x2,y2:y2};
     },
-    pxToPosition: function(point){
-        return Math.floor(point.x / (cellSize + cellBorderWidth)) + "," + Math.floor(point.y / (cellSize + cellBorderWidth));
+    pxToCellCoordinate: function(point) {
+        return this.pxToCellPosition(point.x) + "," + this.pxToCellPosition(point.y);
+    },
+    pxToCellPosition: function(coordinate){
+        return Math.floor(coordinate / (cellSize + cellBorderWidth));
     },
     // cacheAdjust: function(){
     //     for (var x=0;x<10;x++){
@@ -317,38 +339,46 @@ function c_plant(position, originalPlant){
             same: 0
         };
     }else{
+
+        function getRandomChange() {
+            return Math.round(_.random(-53, 52) / 100);
+        }
+
         var change = 0;
         var idPlus = 0;
-        change = Math.round(_.random(-53, 52) / 100);
-        if (change != 0)idPlus =1;
+        change = getRandomChange();
+        if (change != 0) idPlus = 1;
         this.maxHP = originalPlant.maxHP + change;
         this.hp = this.maxHP;
 
-        change = Math.round(_.random(-53, 52) / 100);
-        if (change != 0)idPlus =1;
+        change = getRandomChange();
+        if (change != 0) idPlus = 1;
         this.maxAge = originalPlant.maxAge + change;
         this.age = 0;
 
         this.position = position;
-        this.multiplyChance = originalPlant.multiplyChance + Math.round(_.random(-53, 52) / 100);
+        this.multiplyChance = originalPlant.multiplyChance + getRandomChange();
         this.influence = {};
 
-        change = Math.round(_.random(-53, 52) / 100);
-        if (change != 0)idPlus =1;
+        change = getRandomChange();
+        if (change != 0) idPlus = 1;
         this.influence.different = originalPlant.influence.different + change;
 
 
-        change = Math.round(_.random(-53, 52) / 100);
-        if (change != 0)idPlus =1;
+        change = getRandomChange();
+        if (change != 0) idPlus =1;
         this.influence.self = originalPlant.influence.self + change;
 
 
-        change = Math.round(_.random(-53, 52) / 100);
-        if (change != 0)idPlus =1;
+        change = getRandomChange();
+        if (change != 0) idPlus =1;
         this.influence.same = originalPlant.influence.same + change;
 
         if (idPlus > 0){
             this.identification = "#"+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues);
+            //TODO check performance
+            //this.identification = '#'+Math.random().toString(16).substr(-6);
+
         }else{
             this.identification = originalPlant.identification;
         }
@@ -367,90 +397,90 @@ function c_plant(position, originalPlant){
             return true;
         }
     },
-        this.draw = function(){
+    this.draw = function(){
 
-        },
-        this.die = function(){
-            map.kill(this.position);
-        },
-        this.getLifePercentage = function(){
-            // return Math.min(Math.round((this.hp / this.maxHP) * 100), Math.round((this.maxAge - this.age) * 100));
-            return Math.round(((this.maxAge - this.age))*20);
-        },
-        this.getAdjust = function(){
-            return map.getAdjust(this.position);
-        },
-        this.getAdjustFree = function(){
-            return map.getAdjustFree(this.position);
-        },
-        this.onNextTurn = function(){
-            this.age++;
-            if (this.age == 1){
-                return;//when just born do nothing
+    },
+    this.die = function(){
+        map.kill(this.position);
+    },
+    this.getLifePercentage = function(){
+        // return Math.min(Math.round((this.hp / this.maxHP) * 100), Math.round((this.maxAge - this.age) * 100));
+        return Math.round(((this.maxAge - this.age))*20);
+    },
+    this.getAdjust = function(){
+        return map.getAdjust(this.position);
+    },
+    this.getAdjustFree = function(){
+        return map.getAdjustFree(this.position);
+    },
+    this.onNextTurn = function(){
+        this.age++;
+        if (this.age == 1){
+            return;//when just born do nothing
+        }
+        var selfIdentification = this.identification;
+        for (var x in this.influence){
+            var val = this.influence[x];
+            if (x == 'different'){
+                _.invoke(_.filter(this.getAdjust(), function(obj){if(typeof(obj)=="undefined")debugger;return obj.identification != selfIdentification}), "addHP", val, this);
             }
-            var selfIdentification = this.identification;
-            for (var x in this.influence){
-                var val = this.influence[x];
-                if (x == 'different'){
-                    _.invoke(_.filter(this.getAdjust(), function(obj){if(typeof(obj)=="undefined")debugger;return obj.identification != selfIdentification}), "addHP", val, this);
-                }
-                if (x == 'self'){
-                    if (this.addHP(val, this) === true)return;
-                }
-                if (x == 'same'){
-                    _.invoke(_.where(this.getAdjust(), {identification: this.identification}), "addHP", val, this);
-                }
+            if (x == 'self'){
+                if (this.addHP(val, this) === true)return;
             }
-            if (_.random(0, 100) < this.multiplyChance){
-                var free = this.getAdjustFree();
-
-                if (free.length > 0 ){
-                    // console.log(free);
-                    free = free[randomKey(free)];
-                    // console.log(free);
-                    // free = free.pop();
-                    game.map[free] = new c_plant(free, this);
-                }
-            }
-            if (this.age > this.maxAge){
-                this.die();
-            }
-        },
-        this.renderActions = function(){
-            var selfIdentification = this.identification;
-            for (var x in this.influence){
-                var val = this.influence[x];
-                if (x == 'different' && val != 0 ){
-                    _.each(
-                        _.filter(
-                            this.getAdjust(),
-                            function(obj){
-                                return obj.identification != selfIdentification
-                            }
-                        ),
-                        function(plant){
-                            var self = plant;
-                            return function(plant, val){
-                                var color = val > 0 ? "#00FF00": "#FF0000" ;
-                                game.renderArrow(color, self.position, plant.position);
-                            }
-                        }(this, val)
-                    );
-                }
-                // if (x == 'self'){
-                //     if (this.addHP(val, this) === true)return;
-                // }
-                // if (x == 'same'){
-                //     _.each(_.where(this.getAdjust(), {identification: this.identification}), function (plant) {
-                //         var self = plant;
-                //         return function (plant, val) {
-                //             var color = val > 0 ? "green" : "red";
-                //             game.renderArrow(color, self.position, plant.position);
-                //         }
-                //     }(this, val));
-                // }
+            if (x == 'same'){
+                _.invoke(_.where(this.getAdjust(), {identification: this.identification}), "addHP", val, this);
             }
         }
+        if (_.random(0, 100) < this.multiplyChance){
+            var free = this.getAdjustFree();
+
+            if (free.length > 0 ){
+                // console.log(free);
+                free = free[randomKey(free)];
+                // console.log(free);
+                // free = free.pop();
+                game.map[free] = new c_plant(free, this);
+            }
+        }
+        if (this.age > this.maxAge){
+            this.die();
+        }
+    },
+    this.renderActions = function(){
+        var selfIdentification = this.identification;
+        for (var x in this.influence){
+            var val = this.influence[x];
+            if (x == 'different' && val != 0 ){
+                _.each(
+                    _.filter(
+                        this.getAdjust(),
+                        function(obj){
+                            return obj.identification != selfIdentification
+                        }
+                    ),
+                    function(plant){
+                        var self = plant;
+                        return function(plant, val){
+                            var color = val > 0 ? "#00FF00": "#FF0000" ;
+                            game.renderArrow(color, self.position, plant.position);
+                        }
+                    }(this, val)
+                );
+            }
+            // if (x == 'self'){
+            //     if (this.addHP(val, this) === true)return;
+            // }
+            // if (x == 'same'){
+            //     _.each(_.where(this.getAdjust(), {identification: this.identification}), function (plant) {
+            //         var self = plant;
+            //         return function (plant, val) {
+            //             var color = val > 0 ? "green" : "red";
+            //             game.renderArrow(color, self.position, plant.position);
+            //         }
+            //     }(this, val));
+            // }
+        }
+    }
 }
 //test rnd
 var plus = 0;
