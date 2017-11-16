@@ -36,6 +36,9 @@ var game = {
     shouldRenderArrows: false,
 
     play: function(){
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
         this.interval = setInterval(function(){game.nextTurn()},renderTickInterval);
     },
     stop: function(){
