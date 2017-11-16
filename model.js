@@ -77,6 +77,7 @@ var game = {
         var cursorPosition = this.getCursorPosition(e);
         var x = map.pxToCellPosition(cursorPosition.x);
         var y = map.pxToCellPosition(cursorPosition.y);
+        var radiusSquare = bombRadius*bombRadius;
 
         for ( var mapX = x - bombRadius; mapX <= x + bombRadius; mapX++ ) {
             if (mapX < 0) mapX = 0;
@@ -84,7 +85,10 @@ var game = {
             for ( var mapY = y - bombRadius; mapY <= y + bombRadius; mapY++ ) {
                 if (mapY < 0) mapY = 0;
                 if (mapY > screenWidth) break;
-                map.kill(mapX+ "," + mapY);
+                //add some circles to this square mad world
+                if (((mapX - x)*(mapX - x) + (mapY - y)*(mapY - y)) < radiusSquare) {
+                    map.kill(mapX + "," + mapY);
+                }
             }
         }
     } ,
