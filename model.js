@@ -386,6 +386,7 @@ function c_plant(position, originalPlant){
         this.influence.same = originalPlant.influence.same + change;
 
         if (idPlus > 0){
+            this.kilingVirus = 0;
             this.identification = "#"+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues)+getRandValueFromArray(HEXValues);
             //TODO check performance
             //this.identification = '#'+Math.random().toString(16).substr(-6);
