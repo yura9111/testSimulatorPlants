@@ -86,7 +86,7 @@ var game = {
                 if (mapY < 0) mapY = 0;
                 if (mapY > screenWidth) break;
                 //add some circles to this square mad world
-                if (((mapX - x)*(mapX - x) + (mapY - y)*(mapY - y)) < radiusSquare) {
+                if (Math.pow((mapX - x), 2) + Math.pow((mapY - y), 2) < radiusSquare) {
                     map.kill(mapX + "," + mapY);
                 }
             }
