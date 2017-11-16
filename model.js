@@ -5,6 +5,7 @@ const screenWidth = 80;
 const screenHeight = 30;
 const cellSize = 20;
 const cellBorderWidth = 1;
+const virusKillCommand = 12;
 
 var bombRadius = 5;
 
@@ -50,6 +51,7 @@ var game = {
             document.getElementById('hp').innerHTML = game.map[position].hp + "/" + game.map[position].maxHP;
             document.getElementById('multiply').innerHTML = game.map[position].multiplyChance;
             document.getElementById('identity').innerHTML = game.map[position].identification;
+            document.getElementById('virus').innerHTML = game.map[position].kilingVirus;
             if (game.map[position].influence !== undefined) {
                 document.getElementById('same').innerHTML = game.map[position].influence.same;
                 document.getElementById('different').innerHTML = game.map[position].influence.different;
@@ -336,6 +338,7 @@ function c_plant(position, originalPlant){
         this.xy = position.split(',');
         this.identification = "#666";
         this.multiplyChance = 20;
+        this.kilingVirus = 0;
         this.influence = {
             different: 0,
             self: 0,
@@ -362,6 +365,7 @@ function c_plant(position, originalPlant){
         this.position = position;
         this.xy = position.split(',');
         this.multiplyChance = originalPlant.multiplyChance + getRandomChange();
+        this.kilingVirus = originalPlant.kilingVirus + Math.round(_.random(0, 52) / 100);
         this.influence = {};
 
         change = getRandomChange();
@@ -448,6 +452,10 @@ function c_plant(position, originalPlant){
             }
         }
         if (this.age > this.maxAge){
+            this.die();
+        }
+        if(this.kilingVirus > virusKillCommand){
+            _.each(_.where(this.getAdjust(), {identification: this.identification}), function(plant){plant.kilingVirus = 13});
             this.die();
         }
     },
