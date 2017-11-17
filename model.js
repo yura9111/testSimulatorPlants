@@ -106,7 +106,7 @@ var game = {
         var ctx = canvas.getContext('2d');
         this.ctx = ctx;
 
-        
+
         this.map = [];
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
@@ -125,12 +125,12 @@ var game = {
                     if (this.shouldRender){
                         if(plant.identification !== 0){
                             ctx.fillStyle=plant.identification;
+                        }else{
+                            ctx.fillStyle="#FFFFFF";
                         }
-                        if (this.shouldRender) {
-                            drawCell(ctx, x, y);
-                            if (this.shouldRenderArrows) {
-                                afterDraw.push(plant.position);
-                            }
+                        drawCell(ctx, x, y);
+                        if (this.shouldRenderArrows) {
+                            afterDraw.push(plant.position);
                         }
 
                         // ctx.beginPath();
