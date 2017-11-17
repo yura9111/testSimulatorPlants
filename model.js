@@ -1,9 +1,9 @@
 /**
  * Created by Юра on 26.07.2017.
  */
-const screenWidth = 80;
-const screenHeight = 30;
-const cellSize = 20;
+const screenWidth = 150;
+const screenHeight = 60;
+const cellSize = 10;
 const cellBorderWidth = 1;
 const virusKillCommand = 12;
 
@@ -99,6 +99,14 @@ var game = {
     } ,
 
     init: function(){
+        var canvas = document.getElementById("canvas");
+        canvas.width = screenWidth * (cellSize + cellBorderWidth);
+        canvas.height = screenHeight * (cellSize + cellBorderWidth);
+
+        var ctx = canvas.getContext('2d');
+        this.ctx = ctx;
+
+        
         this.map = [];
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
@@ -107,64 +115,19 @@ var game = {
         }
         this.nextTurn();
     },
-
     nextTurn: function(){
-        var canvas = document.getElementById("canvas");
-        canvas.width = screenWidth * (cellSize + cellBorderWidth);
-        canvas.height = screenHeight * (cellSize + cellBorderWidth);
-
-        var ctx = canvas.getContext('2d');
-        this.ctx = ctx;
-        var colorRed, colorGreen, colorBlue;
+        var ctx = this.ctx;
         var afterDraw = [];
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
                 if (this.map[x + "," + y].identification !== 0){
                     var plant = this.map[x + "," + y];
-                    // try{
-                    //     var color = this.map[x + "," + y].getLifePercentage();
-                    // }catch (e){
-                    //     console.log(this.map[x + "," + y].identification);
-                    //     console.log(x + "," + y);
-                    //     console.log(e);
-                    //     continue;
-                    // }
-                    //draw canvas
                     if (this.shouldRender){
-                        // colorRed = Math.round(color/4);
-                        // colorGreen = Math.round(color/4);
-                        // colorBlue = Math.round(color/4);
-                        // if (plant.influence.different < 0){
-                        //     colorRed += Math.round(color/4);
-                        // }else
-                        // if (plant.influence.different > 0){
-                        //     colorGreen += Math.round(color/4);
-                        // }
-                        // if (plant.influence.same < 0){
-                        //     colorRed += Math.round(color/4);
-                        // }else
-                        // if (plant.influence.same > 0){
-                        //     colorGreen += Math.round(color/4);
-                        // }
-                        // if (plant.influence.self < 0){
-                        //     colorRed += Math.round(color/4);
-                        // }else
-                        // if (plant.influence.self > 0){
-                        //     colorGreen += Math.round(color/4);
-                        // }
-                        // if (colorRed < 10)colorRed = "0"+colorRed;
-                        // if (colorGreen < 10)colorGreen = "0"+colorGreen;
-                        // if (colorBlue  < 10)colorBlue = "0"+colorBlue;
-                        // console.log("#"+colorRed+""+colorGreen+""+colorBlue);
-                        // ctx.fillStyle="#"+colorRed+""+colorGreen+""+colorBlue;
-                        // ctx.strokeStyle = "#"+colorRed+""+colorGreen+""+colorBlue;
                         if(plant.identification !== 0){
                             ctx.fillStyle=plant.identification;
                         }
                         if (this.shouldRender) {
                             drawCell(ctx, x, y);
-                            // ctx.fillStyle = "#FFFFFF";
-                            //drawCell(ctx, x, y);
                             if (this.shouldRenderArrows) {
                                 afterDraw.push(plant.position);
                             }
