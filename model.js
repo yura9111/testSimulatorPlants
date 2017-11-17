@@ -340,7 +340,7 @@ function c_plant(position, originalPlant){
         this.position = position;
         this.xy = position.split(',');
         this.identification = "#666";
-        this.multiplyChance = 20;
+        this.multiplyChance = 50;
         this.kilingVirus = 0;
         this.influence = {
             different: 0,
@@ -447,7 +447,7 @@ function c_plant(position, originalPlant){
             var free = this.getAdjustFree();
 
             if (free.length > 0 ){
-                this.hp -= Math.floor(this.hp/2);
+                this.age += Math.floor(this.maxAge/3);
                 // console.log(free);
                 free = free[randomKey(free)];
                 // console.log(free);
