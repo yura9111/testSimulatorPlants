@@ -120,14 +120,11 @@ var game = {
         var afterDraw = [];
         for (var x = 0; x < screenWidth; x++){
             for (var y = 0; y < screenHeight; y++){
-                if (this.map[x + "," + y].identification !== 0){
-                    var plant = this.map[x + "," + y];
+                var plant = this.map[x + "," + y];
+                if (plant.identification !== 0){
                     if (this.shouldRender){
-                        if(plant.identification !== 0){
-                            ctx.fillStyle=plant.identification;
-                        }else{
-                            ctx.fillStyle="#FFFFFF";
-                        }
+
+                        ctx.fillStyle=plant.identification;
                         drawCell(ctx, x, y);
                         if (this.shouldRenderArrows) {
                             afterDraw.push(plant.position);
